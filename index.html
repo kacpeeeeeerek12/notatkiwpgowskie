@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Notatki</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #9fc6e2; /* jasnoniebieskie tło */
+      font-family: sans-serif;
+      color: black;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #ccc;
+      transition: box-shadow 0.4s ease;
+      backdrop-filter: blur(6px);
+    }
+
+    .container:hover {
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    }
+
+    h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #1e3a8a;
+    }
+
+    .description {
+      font-size: 14px;
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #1e3a8a;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 14px;
+      border: none;
+      border-radius: 10px;
+      box-sizing: border-box;
+      background: radial-gradient(circle at center, #3b5998, #5a8dee);
+      color: white;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    select option {
+      color: black;
+      background: #dce7fa;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      outline: none;
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(90, 141, 238, 0.6);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #d9e6f2;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      background: radial-gradient(circle at center, #3b5998, #5a8dee);
+      color: white;
+      margin-top: 15px;
+      cursor: pointer;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(12px);
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .spacer {
+      margin-top: 20px;
+    }
+
+    #delete-btn {
+      background: radial-gradient(circle at center, #5a8dee, #3b5998);
+    }
+
+    #delete-btn:hover {
+      background: radial-gradient(circle at center, #3b5998, #5a8dee);
+    }
+
+    .format-btn {
+      width: auto;
+      padding: 6px 12px;
+      margin-right: 10px;
+      font-weight: bold;
+      user-select: none;
+      border: none;
+      border-radius: 6px;
+      background: radial-gradient(circle at center, #3b5998, #5a8dee);
+      color: white;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    .format-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .color-picker {
+      width: auto;
+      padding: 8px;
+      margin-top: 5px;
+      margin-left: 10px;
+      vertical-align: middle;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    #title-label-container {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .dates {
+      font-size: 12px;
+      color: #555;
+      margin-top: 10px;
+      text-align: right;
+      font-style: italic;
+    }
+
+    @keyframes pulseWhite {
+      0%, 100% {
+        background: radial-gradient(circle at center, #3b5998, #5a8dee);
+        color: white;
+        filter: brightness(1);
+      }
+      50% {
+        filter: brightness(1.3);
+      }
+    }
+
+    #save-btn {
+      animation: pulseWhite 2.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Notatki</h1>
+    <p class="description">Notatki służą do zapisywania Twoich złotych myśli i refleksji podczas czytania wpisów — miej je zawsze pod ręką.</p>
+
+    <div id="title-label-container">
+      <label for="project-name" style="margin: 0;">Nazwa projektu:</label>
+      <input type="color" id="title-color" class="color-picker" title="Wybierz kolor tytułu" value="#000000" />
+    </div>
+    <input type="text" id="project-name" placeholder="np. Poranna Myśl" style="margin-top:5px;" />
+
+    <label for="note-text">Treść notatki:</label>
+
+    <div>
+      <button class="format-btn" type="button" onclick="formatText('bold')" title="Pogrubienie"><b>B</b></button>
+      <button class="format-btn" type="button" onclick="formatText('underline')" title="Podkreślenie"><u>U</u></button>
+    </div>
+
+    <textarea id="note-text" placeholder="Zapisz swoją notatkę..." style="margin-top:5px;"></textarea>
+
+    <div class="dates" id="note-dates"></div>
+
+    <button id="save-btn" onclick="saveNote()">Zapisz notatkę</button>
+
+    <div class="spacer">
+      <label for="saved-projects">Wczytaj zapisany projekt:</label>
+      <select id="saved-projects" onchange="loadNote()">
+        <option value="">-- wybierz --</option>
+      </select>
+      <button id="delete-btn" onclick="deleteNote()">Usuń notatkę</button>
+    </div>
+  </div>
+
+  <script>
+    const nameInput = document.getElementById('project-name');
+    const noteInput = document.getElementById('note-text');
+    const select = document.getElementById('saved-projects');
+    const titleColorInput = document.getElementById('title-color');
+    const datesDiv = document.getElementById('note-dates');
+
+    // Pomysły na tytuł z prefiksem "np. "
+    const exampleTitles = [
+      "np. Poranna Myśl",
+      "np. Inspiracja Dnia",
+      "np. Pomysł na Projekt",
+      "np. Notatka z Książki",
+      "np. Refleksja Wieczorna",
+      "np. Cytat Motywacyjny"
+    ];
+    let currentExampleIndex = 0;
+
+    let typingTimeout;
+    let deletingTimeout;
+
+    function typeEffect(text, index = 0, callback) {
+      if (index < text.length) {
+        nameInput.value += text.charAt(index);
+        typingTimeout = setTimeout(() => typeEffect(text, index + 1, callback), 150);
+      } else {
+        if (callback) callback();
+      }
+    }
+
+    function deleteEffect(callback) {
+      if (nameInput.value.length > 0) {
+        nameInput.value = nameInput.value.slice(0, -1);
+        deletingTimeout = setTimeout(() => deleteEffect(callback), 100);
+      } else {
+        if (callback) callback();
+      }
+    }
+
+    function cycleExampleTitles() {
+      const nextIndex = (currentExampleIndex + 1) % exampleTitles.length;
+
+      setTimeout(() => {
+        deleteEffect(() => {
+          typeEffect(exampleTitles[nextIndex], 0, () => {
+            currentExampleIndex = nextIndex;
+            cycleExampleTitles();
+          });
+        });
+      }, 1000); // Zmiana co 1 sekundę
+    }
+
+    window.addEventListener('load', () => {
+      if (!nameInput.value.trim()) {
+        typeEffect(exampleTitles[currentExampleIndex], 0, () => {
+          cycleExampleTitles();
+        });
+      }
+      updateProjectList();
+    });
+
+    nameInput.addEventListener('input', () => {
+      clearTimeout(typingTimeout);
+      clearTimeout(deletingTimeout);
+    });
+
+    function formatDate(date) {
+      return date.toLocaleString('pl-PL', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function saveNote() {
+      const name = nameInput.value.trim();
+      const text = noteInput.value;
+      const color = titleColorInput.value;
+
+      if (!name) {
+        alert("Podaj nazwę projektu.");
+        return;
+      }
+
+      const existing = localStorage.getItem("note_" + name);
+      let created = new Date().toISOString();
+      if (existing) {
+        try {
+          const parsed = JSON.parse(existing);
+          if (parsed.created) {
+            created = parsed.created;
+          }
+        } catch {}
+      }
+
+      const noteData = {
+        text,
+        color,
+        created,
+        updated: new Date().toISOString()
+      };
+
+      localStorage.setItem("note_" + name, JSON.stringify(noteData));
+      alert("Zapisano.");
+      updateProjectList();
+      showDates(noteData);
+    }
+
+    function loadNote() {
+      const name = select.value;
+      if (!name) {
+        nameInput.value = '';
+        noteInput.value = '';
+        titleColorInput.value = '#000000';
+        datesDiv.textContent = '';
+        return;
+      }
+
+      nameInput.value = name;
+      const noteDataStr = localStorage.getItem("note_" + name);
+      if(noteDataStr) {
+        try {
+          const noteData = JSON.parse(noteDataStr);
+          noteInput.value = noteData.text || '';
+          titleColorInput.value = noteData.color || '#000000';
+          showDates(noteData);
+        } catch {
+          noteInput.value = '';
+          titleColorInput.value = '#000000';
+          datesDiv.textContent = '';
+        }
+      } else {
+        noteInput.value = '';
+        titleColorInput.value = '#000000';
+        datesDiv.textContent = '';
+      }
+    }
+
+    function updateProjectList() {
+      const keys = Object.keys(localStorage).filter(k => k.startsWith("note_"));
+      select.innerHTML = '<option value="">-- wybierz --</option>';
+      keys.forEach(k => {
+        const name = k.replace("note_", "");
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+    }
+
+    function deleteNote() {
+      const name = select.value;
+      if (!name) {
+        alert("Wybierz notatkę do usunięcia.");
+        return;
+      }
+      if(confirm(`Na pewno chcesz usunąć notatkę "${name}"?`)) {
+        localStorage.removeItem("note_" + name);
+        alert("Usunięto notatkę.");
+        nameInput.value = '';
+        noteInput.value = '';
+        titleColorInput.value = '#000000';
+        datesDiv.textContent = '';
+        updateProjectList();
+      }
+    }
+
+    function formatText(command) {
+      const textarea = noteInput;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      if (start === end) return;
+
+      let selectedText = textarea.value.substring(start, end);
+      let beforeText = textarea.value.substring(0, start);
+      let afterText = textarea.value.substring(end);
+
+      if (command === 'bold') {
+        selectedText = selectedText.startsWith("**") && selectedText.endsWith("**")
+          ? selectedText.slice(2, -2)
+          : `**${selectedText}**`;
+      } else if (command === 'underline') {
+        selectedText = selectedText.startsWith("__") && selectedText.endsWith("__")
+          ? selectedText.slice(2, -2)
+          : `__${selectedText}__`;
+      }
+
+      textarea.value = beforeText + selectedText + afterText;
+      textarea.selectionStart = start;
+      textarea.selectionEnd = start + selectedText.length;
+      textarea.focus();
+    }
+
+    function showDates(noteData) {
+      let text = "";
+      if(noteData.created) {
+        const created = new Date(noteData.created);
+        text += `Utworzono: ${formatDate(created)}`;
+      }
+      if(noteData.updated) {
+        const updated = new Date(noteData.updated);
+        text += `<br>Ostatnia edycja: ${formatDate(updated)}`;
+      }
+      datesDiv.innerHTML = text;
+    }
+  </script>
+</body>
+</html>
